@@ -6,9 +6,11 @@
 typedef struct 
 {
     /* data */
-    float accel[3];
-    float gyro[3];
-    float mag[3];
+    float ax,ay,az;
+    float gx,gy,gz;
+    float mx,my,mz;
+
+    float dt;
 
 }IMU;
 
@@ -28,5 +30,6 @@ typedef struct
 bool complementaryInit(void);
 void complementaryUpdate(IMU imu);
 bool complementaryGetInfo(complementary *p_info);
+float invSqrt(float x);
 
 #endif

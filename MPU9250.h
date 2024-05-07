@@ -4,8 +4,8 @@
 
 #include <Wire.h>
 
-#include "./MPU9250/MPU9250RegisterMap.h"
-#include "./MPU9250/QuaternionFilter.h"
+#include "MPU9250/MPU9250RegisterMap.h"
+#include "MPU9250/QuaternionFilter.h"
 
 enum class ACCEL_FS_SEL
 {
@@ -252,7 +252,7 @@ public:
         if (!available())
             return false;
 
-        update_accel_gyro_offset(); //TODO: Here I 수정
+        update_accel_gyro();
         update_mag();
 
         // Madgwick function needs to be fed North, East, and Down direction like
@@ -547,24 +547,6 @@ public:
         g[1] = (float)raw_acc_gyro_data[5] * gyro_resolution;
         g[2] = (float)raw_acc_gyro_data[6] * gyro_resolution;
     }
-    void update_accel_gyro_offset()
-    {
-        int16_t raw_acc_gyro_data[7];       // used to read all 14 bytes at once from the MPU9250 accel/gyro
-        read_accel_gyro(raw_acc_gyro_data); // INT cleared on any read
-
-        // Now we'll calculate the accleration value into actual g's
-        a[0] = (float)raw_acc_gyro_data[0] * acc_resolution; // get actual g value, this depends on scale being set
-        a[1] = (float)raw_acc_gyro_data[1] * acc_resolution;
-        a[2] = (float)raw_acc_gyro_data[2] * acc_resolution;
-
-        temperature_count = raw_acc_gyro_data[3];                 // Read the adc values
-        temperature = ((float)temperature_count) / 333.87 + 21.0; // Temperature in degrees Centigrade
-
-        // Calculate the gyro value into actual degrees per second
-        g[0] = (float)raw_acc_gyro_data[4] * gyro_resolution - gyro_bias[0]; // get actual gyro value, this depends on scale being set
-        g[1] = (float)raw_acc_gyro_data[5] * gyro_resolution - gyro_bias[1];
-        g[2] = (float)raw_acc_gyro_data[6] * gyro_resolution - gyro_bias[2];
-    }
 
 private:
     void read_accel_gyro(int16_t *destination)
@@ -641,9 +623,28 @@ private:
         collect_acc_gyro_data_to(acc_bias, gyro_bias);
         write_accel_offset();
         write_gyro_offset();
-        delay(100);
+        // delay(100);
+        if (b_verbose)
+        {
+            Serial.println("Accel Gyro Calibration done!");
+
+            Serial.println("Acc (mG)");
+            Serial.print(acc_bias[0]);
+            Serial.print(", ");
+            Serial.print(acc_bias[1]);
+            Serial.print(", ");
+            Serial.print(acc_bias[2]);
+            Serial.println();
+            Serial.println("AK8963 gyro scale (mG)");
+            Serial.print(gyro_bias[0]);
+            Serial.print(", ");
+            Serial.print(gyro_bias[1]);
+            Serial.print(", ");
+            Serial.print(gyro_bias[2]);
+            Serial.println();
+        }
         initMPU9250();
-        delay(1000);
+        // delay(1000);
     }
 
     void set_acc_gyro_to_calibration()
