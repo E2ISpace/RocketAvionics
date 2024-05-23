@@ -1,7 +1,8 @@
 #include "MPU9250.h"
 #include <math.h>
 MPU9250 mpu; // You can also use MPU9255 as is
-
+Avionics test;
+bool state = 0;
 void setup()
 {
     Serial.begin(115200);
@@ -28,10 +29,48 @@ void setup()
     mpu.selectFilter(QuatFilterSel::MAHONY);
 }
 
-void loop() {
-    if (mpu.update()) {
-        Serial.print(mpu.getYaw()); Serial.print(", ");
-        Serial.print(mpu.getPitch()); Serial.print(", ");
+void loop()
+{
+    
+    /**
+     * initial Heading and .. others
+     * 
+     */
+    if (!state)
+    {
+        test.initialize();
+        state = 1;
+    }
+    if (mpu.update())
+    {
+        Serial.print(mpu.getYaw());
+        Serial.print(", ");
+        Serial.print(mpu.getPitch());
+        Serial.print(", ");
         Serial.println(mpu.getRoll());
     }
+
+    /**
+     * @brief reInitialize remote!
+     * @param none
+     * @if button on
+     */
+    if (digitalRead(13) == HIGH)
+    {
+        test.reinitialize();
+        state = 1;
+    }
+
+    if (TRUE/*heading where*/)
+    {
+        test.deployParachute();
+    }
 }
+
+class Avionics
+{
+private:
+public:
+    virtual void initialize() = 0;
+    virtual void deployParachute() = 0;
+};
