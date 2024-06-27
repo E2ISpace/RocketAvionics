@@ -19,11 +19,20 @@ void loop() {
   Serial.print("Sending packet: ");
   Serial.println(counter);
 
+  //receiver에서 remote_reset_key를 받으면 
+  if(received_remote_reset == true) {
+      LoRa.beginPacket();
+        LoRa.print("Received Reset_Key.");
+        LoRa.print("RESET_START.....");
+      LoRa.endPacket();
+      received_remote_reset = false;
+  }
+
   // send packet
   LoRa.beginPacket();
 //  LoRa.print("10123456789,0123456789,0123456789,0123456789,0123456789,0123456789,0123456789,0123456789,0123456789,0123456789,0123456789");
-  LoRa.print("01234567890,01234567890,01234567890,01234567890,01234567890");
-  LoRa.print(counter);
+    LoRa.print("01234567890,01234567890,01234567890,01234567890,01234567890");
+    LoRa.print(counter);
   LoRa.endPacket();
 
 
