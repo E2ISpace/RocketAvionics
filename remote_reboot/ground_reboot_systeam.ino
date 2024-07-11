@@ -13,14 +13,10 @@ void setup() {
 
   // LoRa 모듈 초기화
   LoRa.setPins(csPin, resetPin, irqPin);
-  if (!LoRa.begin(920E6)) { // 920.9 MHz -> 920E6 (920 MHz)
+  if (!LoRa.begin(433E6)) { // 주파수를 수신기와 동일하게 설정
     Serial.println("Starting LoRa failed!");
     while (1);
   }
-
-  // 메시지 수신 모드로 전환
-  LoRa.onReceive(onReceive);
-  LoRa.receive();
 }
 
 void loop() {
@@ -41,16 +37,4 @@ void loop() {
   delay(500); // 버튼 입력 확인 주기 (500ms)
 }
 
-void onReceive(int packetSize) {
-  if (packetSize == 0) return;
 
-  String incoming = "";
-  while (LoRa.available()) {
-    incoming += (char)LoRa.read();
-  }
-
-  Serial.print("Received: ");
-  Serial.println(incoming);
-
-  // 필요시 추가 처리
-}

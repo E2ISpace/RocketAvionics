@@ -1,9 +1,9 @@
 #include <SPI.h>
 #include <LoRa.h>
 
-const int csPin = 10;    // LoRa module CS pin
-const int resetPin = 9;  // LoRa module reset pin
-const int irqPin = 2;    // LoRa module IRQ pin
+const int csPin = 10;    // LoRa 모듈 CS 핀
+const int resetPin = 9;  // LoRa 모듈 리셋 핀
+const int irqPin = 2;    // LoRa 모듈 IRQ 핀
 
 void setup() {
   Serial.begin(9600);
@@ -11,9 +11,9 @@ void setup() {
 
   Serial.println("LoRa Receiver");
 
-  // Initialize LoRa module
+  // LoRa 모듈 초기화
   LoRa.setPins(csPin, resetPin, irqPin);
-  if (!LoRa.begin(433E6)) {
+  if (!LoRa.begin(433E6)) { // 주파수를 송신기와 동일하게 설정
     Serial.println("Starting LoRa failed!");
     while (1);
   }
@@ -23,12 +23,12 @@ void setup() {
 }
 
 void loop() {
-  // Do nothing, wait for LoRa messages
+  // 아무것도 하지 않고 LoRa 메시지를 기다림
 }
 
-// 수신
+// 수신 함수
 void onReceive(int packetSize) {
-  if (packetSize == 0) return; // if there's no packet, return
+  if (packetSize == 0) return; // 패킷이 없으면 반환
 
   String incoming = "";
   while (LoRa.available()) {
@@ -43,13 +43,15 @@ void onReceive(int packetSize) {
 
     // 송신
     LoRa.beginPacket();
-    LoRa.print("REBOOT_SUCCES");
+    LoRa.print("REBOOT_SUCCESS");
     LoRa.endPacket();
     delay(1000); // 송신 완료를 위한 지연 시간
 
-    // Reboot
-    //asm volatile ("  jmp 0");
-    _reboot_Teensyduino_();
+    // 재부팅
+    void(* resetFunc) (void) = 0; // 함수 포인터 정의
+    resetFunc(); // 재부팅 실행
   }
 }
+
+
 
