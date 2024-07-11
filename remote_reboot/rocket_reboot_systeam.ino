@@ -26,7 +26,7 @@ void loop() {
   // Do nothing, wait for LoRa messages
 }
 
-//수신
+// 수신
 void onReceive(int packetSize) {
   if (packetSize == 0) return; // if there's no packet, return
 
@@ -40,13 +40,16 @@ void onReceive(int packetSize) {
 
   if (incoming == "REBOOT") {
     Serial.println("Rebooting...");
-    delay(1000); // Give time to print message
-    asm volatile ("  jmp 0"); //reboot
 
-    //송신
+    // 송신
     LoRa.beginPacket();
-      LoRa.print("REBOOT_SUCCES");
+    LoRa.print("REBOOT_SUCCES");
     LoRa.endPacket();
+    delay(1000); // 송신 완료를 위한 지연 시간
+
+    // Reboot
+    //asm volatile ("  jmp 0");
+    _reboot_Teensyduino_();
   }
 }
 
