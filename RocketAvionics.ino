@@ -48,6 +48,19 @@ void loop()
         Serial.print(mpu.getPitch());
         Serial.print(", ");
         Serial.println(mpu.getRoll());
+
+        //LoRa.beginPacket();
+        
+        //LoRa.print(mpu.getYaw());
+        //LoRa.print("/ ");
+
+        //LoRa.print(mpu.getPitch());
+       // LoRa.print("/ ");
+
+       // LoRa.print(mpu.getRoll());
+        //LoRa.print("/ ");
+
+        //LoRa.endPacket();
     }
 
     /**
