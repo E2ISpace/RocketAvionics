@@ -5,6 +5,18 @@ Avionics test;
 bool state = 0;
 void setup()
 {
+
+    //LoRa
+    Serial.begin(9600); 
+    while (!Serial);
+
+    Serial.println("LoRa Sender");
+
+    if (!LoRa.begin(9209E5)) {
+        Serial.println("Starting LoRa failed!");
+        while (1);
+    }
+
     Serial.begin(115200);
     Wire.begin();
     delay(2000);
@@ -49,18 +61,18 @@ void loop()
         Serial.print(", ");
         Serial.println(mpu.getRoll());
 
-        //LoRa.beginPacket();
+        LoRa.beginPacket();
         
-        //LoRa.print(mpu.getYaw());
-        //LoRa.print("/ ");
+        LoRa.print(mpu.getYaw());
+        LoRa.print("/ ");
 
-        //LoRa.print(mpu.getPitch());
-       // LoRa.print("/ ");
+        LoRa.print(mpu.getPitch());
+        LoRa.print("/ ");
 
-       // LoRa.print(mpu.getRoll());
-        //LoRa.print("/ ");
+        LoRa.print(mpu.getRoll());
+        LoRa.print("/ ");
 
-        //LoRa.endPacket();
+        LoRa.endPacket();
     }
 
     /**
