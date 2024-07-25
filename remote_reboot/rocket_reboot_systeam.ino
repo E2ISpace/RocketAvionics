@@ -50,6 +50,7 @@ void onReceive(int packetSize) {
     // 재부팅
     void(* resetFunc) (void) = 0; // 함수 포인터 정의
     resetFunc(); // 재부팅 실행
+    
   }
 }
 
