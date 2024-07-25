@@ -1,5 +1,7 @@
 #include <SPI.h>
 #include <LoRa.h>
+#include "LoRareboot.h"
+
 
 void setup() {
   Serial.begin(9600);
