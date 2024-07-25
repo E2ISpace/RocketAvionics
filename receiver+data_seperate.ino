@@ -68,6 +68,7 @@ void onReceive(int packetSize) {
     LoRa.endPacket();
     delay(1000); // 송신 완료를 위한 지연 시간
 
+    Serial.println("REBOOT_SUCCESS");
     // 재부팅
     void(* resetFunc) (void) = 0; // 함수 포인터 정의
     resetFunc(); // 재부팅 실행
