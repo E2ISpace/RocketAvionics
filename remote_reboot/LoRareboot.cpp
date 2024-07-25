@@ -1,10 +1,11 @@
 // LoRareboot.cpp
 #include "LoRareboot.h"
 
-LoRareboot::LoRareboot(int csPin, int resetPin, int irqPin, long frequency)
-    : csPin(csPin), resetPin(resetPin), irqPin(irqPin), frequency(frequency) {}
+LoRareboot::LoRareboot(int csPin, int resetPin, int irqPin)
+    : csPin(csPin), resetPin(resetPin), irqPin(irqPin), frequency(0) {}
 
-void LoRareboot::begin() {
+void LoRareboot::begin(long frequency) {
+    this->frequency = frequency;
     Serial.begin(9600);
     while (!Serial);
 
@@ -19,6 +20,14 @@ void LoRareboot::begin() {
 
     LoRa.onReceive(onReceive);
     LoRa.receive();
+}
+
+void LoRareboot::setFrequency(long frequency) {
+    this->frequency = frequency;
+    if (!LoRa.begin(frequency)) {
+        Serial.println("Setting frequency failed!");
+        while (1);
+    }
 }
 
 void LoRareboot::onReceive(int packetSize) {

@@ -7,8 +7,9 @@
 
 class LoRareboot {
 public:
-    LoRareboot(int csPin, int resetPin, int irqPin, long frequency);
-    void begin();
+    LoRareboot(int csPin, int resetPin, int irqPin);
+    void begin(long frequency);
+    void setFrequency(long frequency);
     static void onReceive(int packetSize);
 
 private:
