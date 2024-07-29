@@ -48,7 +48,7 @@ void LoRareboot::onReceive(int packetSize) {
         LoRa.beginPacket();
         LoRa.print("REBOOT_SUCCESS");
         LoRa.endPacket();
-        delay(1000); // 송신 완료를 위한 지연 시간
+        //delay(1000); // 송신 완료를 위한 지연 시간
 
         // 재부팅
         void(* resetFunc) (void) = 0; // 함수 포인터 정의

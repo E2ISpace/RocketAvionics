@@ -2,17 +2,15 @@
 #include <LoRa.h>
 #include "LoRareboot.h"
 
+const int csPin = 10;    // LoRa 모듈 CS 핀
+const int resetPin = 9;  // LoRa 모듈 리셋 핀
+const int irqPin = 2;    // LoRa 모듈 IRQ 핀
+const long frequency = 9209E5; // 주파수 설정
+
+LoRareboot receiver(csPin, resetPin, irqPin);
 
 void setup() {
-  Serial.begin(9600);
-  while (!Serial);
-
-  Serial.println("LoRa Receiver");
-
-  if (!LoRa.begin(9209E5)) {
-    Serial.println("Starting LoRa failed!");
-    while (1);
-  }
+  receiver.begin(9209E5);
 }
 
 void loop() {
@@ -50,32 +48,6 @@ void loop() {
   }
 }
 
-void onReceive(int packetSize) {
-  if (packetSize == 0) return; // 패킷이 없으면 반환
 
-  String incoming = "";
-  while (LoRa.available()) {
-    incoming += (char)LoRa.read();
-  }
-
-  Serial.print("Received: ");
-  Serial.println(incoming);
-
-  if (incoming == "REBOOT") {
-    Serial.println("Rebooting...");
-
-    // 송신
-    LoRa.beginPacket();
-    LoRa.print("REBOOT_SUCCESS");
-    LoRa.endPacket();
-    delay(1000); // 송신 완료를 위한 지연 시간
-
-    Serial.println("REBOOT_SUCCESS");
-    // 재부팅
-    void(* resetFunc) (void) = 0; // 함수 포인터 정의
-    resetFunc(); // 재부팅 실행
-    
-  }
-}
 
 

@@ -3,17 +3,17 @@
 #include "RocketAvionics.h" // 헤더 파일 포함
 int counter = 0;
 
+const int csPin = 10;    // LoRa 모듈 CS 핀
+const int resetPin = 9;  // LoRa 모듈 리셋 핀
+const int irqPin = 2;    // LoRa 모듈 IRQ 핀
+const long frequency = 9209E5; // 주파수 설정
+
+LoRareboot receiver(csPin, resetPin, irqPin);
+
 void setup() {
-  Serial.begin(9600); 
-  while (!Serial);
-
-  Serial.println("LoRa Sender");
-
-  if (!LoRa.begin(9209E5)) {
-    Serial.println("Starting LoRa failed!");
-    while (1);
-  }
+  receiver.begin(frequency);
   setupRocketAvionics(); // Avionics 설정 함수 호출
+  
 }
 
 void loop() {
@@ -21,17 +21,6 @@ void loop() {
   
   Serial.print("Sending packet: ");
   Serial.println(counter);
-
-  // //receiver에서 remote_reset_key를 받으면 
-  // if(received_remote_reset == true) {
-  //     LoRa.beginPacket();
-  //       LoRa.print("Received Reset_Key.");
-  //       LoRa.print("RESET_START.....");
-  //     LoRa.endPacket();
-  //     received_remote_reset = false;
-  // }
-
-  // send packet
 
 // 패킷 전송
     LoRa.beginPacket();

@@ -2,6 +2,7 @@
 #include <LoRa.h>
 
 int counter = 0;
+const long frequency = 9209E5; // 주파수 설정
 
 void setup() {
   Serial.begin(9600); 

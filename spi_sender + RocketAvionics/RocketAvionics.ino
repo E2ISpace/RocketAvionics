@@ -14,6 +14,7 @@ void setupRocketAvionics() {
     Wire.begin();
     Serial.begin(115200);
 
+    
     MPU9250Setting setting;
     setting.accel_fs_sel = ACCEL_FS_SEL::A16G;
     setting.gyro_fs_sel = GYRO_FS_SEL::G2000DPS;
