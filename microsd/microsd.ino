@@ -1,39 +1,46 @@
-#include <SD.h>
 #include <SPI.h>
+#include <SD.h>
 
-const int chipSelect = 0; 
+File myFile;
 
 void setup() {
-  // 시리얼 통신 시작
   Serial.begin(9600);
- 
-  // 테스트 파일 생성 및 작성
-  File testFile = SD.open("test.txt", FILE_WRITE);
+  Serial.print("Initializing SD card...");
   
-  if (testFile) {
+  if (!SD.begin(4)) { 
+    Serial.println("initialization failed!"); 
+    while (1);
+  }
+  Serial.println("initialization done.");
+
+  // 파일을 쓸 준비
+  myFile = SD.open("test.txt", FILE_WRITE); 
+  
+  if (myFile) { 
     Serial.print("Writing to test.txt...");
-    testFile.println("Testing 1, 2, 3...");
-    testFile.close();
+    myFile.println("OK");
+    myFile.close(); 
     Serial.println("done.");
   } else {
     Serial.println("error opening test.txt");
   }
 
-  // 파일 읽기 테스트
-  testFile = SD.open("test.txt");
-  if (testFile) {
+  // 파일을 읽기 위해 열기
+  myFile = SD.open("test.txt");
+  
+  if (myFile) {
     Serial.println("test.txt:");
 
-    // 파일의 모든 내용을 읽어 시리얼 모니터에 출력합니다.
-    while (testFile.available()) {
-      Serial.write(testFile.read());
+    while (myFile.available()) {
+      Serial.write(myFile.read()); 
     }
-    testFile.close();
+    myFile.close(); 
   } else {
+   
     Serial.println("error opening test.txt");
   }
 }
 
 void loop() {
-  // 루프에서 별도의 동작은 하지 않습니다.
+
 }
