@@ -1,9 +1,12 @@
 #include <SPI.h>
 #include <LoRa.h>
+#include <Servo.h>
 
 const int csPin = 10;    // LoRa 모듈 CS 핀
 const int resetPin = 9;  // LoRa 모듈 리셋 핀
 const int irqPin = 2;    // LoRa 모듈 IRQ 핀
+
+Servo servo;
 
 void setup() {
   Serial.begin(9600);
@@ -20,6 +23,12 @@ void setup() {
 
   LoRa.onReceive(onReceive);
   LoRa.receive();
+
+
+  //로켓 사출
+  servo.attach(22); // 서보 모터 핀에 연결
+  servo.write(0); // 서보 모터 초기 조건
+
 }
 
 void loop() {
@@ -38,7 +47,7 @@ void onReceive(int packetSize) {
   Serial.print("Received: ");
   Serial.println(incoming);
 
-  if (incoming == "REBOOT") {
+  if (incoming == "REBOOT" || incoming == "R") {
     Serial.println("Rebooting...");
 
     // 송신
@@ -51,6 +60,12 @@ void onReceive(int packetSize) {
     void(* resetFunc) (void) = 0; // 함수 포인터 정의
     resetFunc(); // 재부팅 실행
     
+  }
+  if else(incoming == "sos" || incoming == "SOS") {
+    Serial.println("Parachute Deployed");
+    servo.write(72); // 서보 모터를 72도 위치로 이동
+    delay(1000); // 1초 대기
+    servo.write(0); // 서보 모터를 원래 위치로 복귀
   }
 }
 
