@@ -1,46 +1,48 @@
-#include <SPI.h>
 #include <SD.h>
+#include <SPI.h>
 
-File myFile;
+#define SS 10
+
 
 void setup() {
+  // 시리얼 통신 시작
   Serial.begin(9600);
-  Serial.print("Initializing SD card...");
-  
-  if (!SD.begin(4)) { 
-    Serial.println("initialization failed!"); 
-    while (1);
-  }
-  Serial.println("initialization done.");
+  delay(1000); // 시리얼 통신 초기화 대기
 
-  // 파일을 쓸 준비
-  myFile = SD.open("test.txt", FILE_WRITE); 
-  
-  if (myFile) { 
-    Serial.print("Writing to test.txt...");
-    myFile.println("OK");
-    myFile.close(); 
-    Serial.println("done.");
+  // SD 카드 초기화
+  if (!SD.begin(SS)) {
+    Serial.println("SD 카드 초기화 실패!");
+    return;
+  }
+  Serial.println("SD 카드 초기화 완료.");
+
+  // 테스트 파일 생성 및 작성
+  File testFile = SD.open("test.txt", FILE_WRITE);
+
+  if (testFile) {
+    Serial.print("test.txt에 쓰기...");
+    testFile.println("Testing 1, 2, 3...");
+    testFile.close();
+    Serial.println("완료.");
   } else {
-    Serial.println("error opening test.txt");
+    Serial.println("test.txt 파일 열기 오류");
   }
 
-  // 파일을 읽기 위해 열기
-  myFile = SD.open("test.txt");
-  
-  if (myFile) {
-    Serial.println("test.txt:");
+  // 파일 읽기 테스트
+  testFile = SD.open("test.txt");
+  if (testFile) {
+    Serial.println("test.txt 내용:");
 
-    while (myFile.available()) {
-      Serial.write(myFile.read()); 
+    // 파일의 모든 내용을 읽어 시리얼 모니터에 출력
+    while (testFile.available()) {
+      Serial.write(testFile.read());
     }
-    myFile.close(); 
+    testFile.close();
   } else {
-   
-    Serial.println("error opening test.txt");
+    Serial.println("test.txt 파일 열기 오류");
   }
 }
 
 void loop() {
-
+  // 루프에서 별도의 동작은 하지 않습니다.
 }

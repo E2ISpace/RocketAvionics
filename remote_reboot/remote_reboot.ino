@@ -4,6 +4,8 @@ const int csPin = 10;
 const int resetPin = 9;
 const int irqPin = 2;
 
+// pinMode(csPin, OUTPUT);
+// digitalWrite(csPin, HIGH);
 LoRaReboot receiver(csPin, resetPin, irqPin);
 
 void setup() {

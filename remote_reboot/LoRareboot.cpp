@@ -1,5 +1,7 @@
-#include "LoRareboot.h"
+#include <Servo.h>
 
+#include "LoRareboot.h"
+Servo servo;
 LoRaReboot* instance = nullptr;
 
 LoRaReboot::LoRaReboot(int csPin, int resetPin, int irqPin)
