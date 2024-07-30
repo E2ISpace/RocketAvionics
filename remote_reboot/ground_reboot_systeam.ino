@@ -30,7 +30,14 @@ void loop() {
       LoRa.beginPacket();
       LoRa.print("REBOOT");
       LoRa.endPacket();
-    } else {
+    } 
+    if else(input.equals("sos")) {
+      Serial.println("Sending reboot signal...");
+      LoRa.beginPacket();
+      LoRa.print("sos");
+      LoRa.endPacket();
+    }
+    else {
       Serial.println("Unknown command. Type 'reboot' to reboot Arduino.");
     }
   }

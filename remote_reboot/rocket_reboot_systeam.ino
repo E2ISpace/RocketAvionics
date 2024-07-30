@@ -63,9 +63,9 @@ void onReceive(int packetSize) {
   }
   if else(incoming == "sos" || incoming == "SOS") {
     Serial.println("Parachute Deployed");
-    servo.write(72); // 서보 모터를 72도 위치로 이동
-    delay(1000); // 1초 대기
-    servo.write(0); // 서보 모터를 원래 위치로 복귀
+    servo.write(72); 
+    delay(1000); 
+    servo.write(0); 
   }
 }
 
