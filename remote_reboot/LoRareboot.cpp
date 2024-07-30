@@ -1,57 +1,54 @@
-// LoRareboot.cpp
 #include "LoRareboot.h"
 
-LoRareboot::LoRareboot(int csPin, int resetPin, int irqPin)
-    : csPin(csPin), resetPin(resetPin), irqPin(irqPin), frequency(0) {}
+LoRaReboot* instance = nullptr;
 
-void LoRareboot::begin(long frequency) {
-    this->frequency = frequency;
-    Serial.begin(9600);
-    while (!Serial);
-
-    Serial.println("LoRa Receiver");
-
-    // LoRa 모듈 초기화
-    LoRa.setPins(csPin, resetPin, irqPin);
-    if (!LoRa.begin(frequency)) {
-        Serial.println("Starting LoRa failed!");
-        while (1);
-    }
-
-    LoRa.onReceive(onReceive);
-    LoRa.receive();
+LoRaReboot::LoRaReboot(int csPin, int resetPin, int irqPin)
+  : _csPin(csPin), _resetPin(resetPin), _irqPin(irqPin) {
+  instance = this;
 }
 
-void LoRareboot::setFrequency(long frequency) {
-    this->frequency = frequency;
-    if (!LoRa.begin(frequency)) {
-        Serial.println("Setting frequency failed!");
-        while (1);
-    }
+void LoRaReboot::begin(long frequency) {
+  Serial.begin(9600);
+  while (!Serial);
+
+  Serial.println("LoRa Receiver");
+
+  LoRa.setPins(_csPin, _resetPin, _irqPin);
+  if (!LoRa.begin(frequency)) {
+    Serial.println("Starting LoRa failed!");
+    while (1);
+  }
+
+  LoRa.onReceive(_onReceiveWrapper);
+  LoRa.receive();
 }
 
-void LoRareboot::onReceive(int packetSize) {
-    if (packetSize == 0) return; // 패킷이 없으면 반환
+void LoRaReboot::_onReceiveWrapper(int packetSize) {
+  if (instance) {
+    instance->onReceive(packetSize);
+  }
+}
 
-    String incoming = "";
-    while (LoRa.available()) {
-        incoming += (char)LoRa.read();
-    }
+void LoRaReboot::onReceive(int packetSize) {
+  if (packetSize == 0) return;
 
-    Serial.print("Received: ");
-    Serial.println(incoming);
+  String incoming = "";
+  while (LoRa.available()) {
+    incoming += (char)LoRa.read();
+  }
 
-    if (incoming == "REBOOT") {
-        Serial.println("Rebooting...");
+  Serial.print("Received: ");
+  Serial.println(incoming);
 
-        // 송신
-        LoRa.beginPacket();
-        LoRa.print("REBOOT_SUCCESS");
-        LoRa.endPacket();
-        //delay(1000); // 송신 완료를 위한 지연 시간
+  if (incoming == "REBOOT") {
+    Serial.println("Rebooting...");
 
-        // 재부팅
-        void(* resetFunc) (void) = 0; // 함수 포인터 정의
-        resetFunc(); // 재부팅 실행
-    }
+    LoRa.beginPacket();
+    LoRa.print("REBOOT_SUCCESS");
+    LoRa.endPacket();
+    delay(1000);
+
+    void(* resetFunc) (void) = 0;
+    resetFunc();
+  }
 }

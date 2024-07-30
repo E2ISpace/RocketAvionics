@@ -1,22 +1,21 @@
-// LoRareboot.h
 #ifndef LORAREBOOT_H
 #define LORAREBOOT_H
 
-#include <Arduino.h>
+#include <SPI.h>
 #include <LoRa.h>
 
-class LoRareboot {
+class LoRaReboot {
 public:
-    LoRareboot(int csPin, int resetPin, int irqPin);
-    void begin(long frequency);
-    void setFrequency(long frequency);
-    static void onReceive(int packetSize);
+  LoRaReboot(int csPin, int resetPin, int irqPin);
+  void begin(long frequency);
+  void onReceive(int packetSize);
 
 private:
-    int csPin;
-    int resetPin;
-    int irqPin;
-    long frequency;
+  int _csPin;
+  int _resetPin;
+  int _irqPin;
+
+  static void _onReceiveWrapper(int packetSize);
 };
 
-#endif // LORAREBOOT_H
+#endif
