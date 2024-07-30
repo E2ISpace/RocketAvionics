@@ -51,4 +51,12 @@ void LoRaReboot::onReceive(int packetSize) {
     void(* resetFunc) (void) = 0;
     resetFunc();
   }
+  else if (incoming == "sos")
+  {
+    Serial.println("Parachute Deployed");
+    servo.write(72); 
+    delay(1000); 
+    servo.write(0); 
+  }
+  
 }
