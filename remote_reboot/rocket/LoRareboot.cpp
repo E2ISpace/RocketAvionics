@@ -42,7 +42,7 @@ void LoRaReboot::onReceive(int packetSize) {
   Serial.print("Received: ");
   Serial.println(incoming);
 
-  if (incoming == "REBOOT") {
+  if (incoming == "REBOOT" || incoming == "R") {
     Serial.println("Rebooting...");
 
     LoRa.beginPacket();
@@ -53,7 +53,7 @@ void LoRaReboot::onReceive(int packetSize) {
     void(* resetFunc) (void) = 0;
     resetFunc();
   }
-  else if (incoming == "sos")
+  else if (incoming == "sos" || incoming == "SOS")
   {
     Serial.println("Parachute Deployed");
     servo.write(72); 
