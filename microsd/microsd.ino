@@ -1,7 +1,7 @@
 #include <SD.h>
 #include <SPI.h>
 
-#define SS 10
+#define SS 0
 
 
 void setup() {
