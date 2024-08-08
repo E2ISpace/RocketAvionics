@@ -13,7 +13,7 @@ void setup() {
 
   // LoRa 모듈 초기화
   LoRa.setPins(csPin, resetPin, irqPin);
-  if (!LoRa.begin(920E6)) { // 주파수를 송신기와 동일하게 설정
+  if (!LoRa.begin(9209E5)) { // 주파수를 송신기와 동일하게 설정
     Serial.println("Starting LoRa failed!");
     while (1);
   }
@@ -25,7 +25,7 @@ void loop() {
     input.trim(); // 입력 문자열의 앞뒤 공백 제거
 
     // 입력된 문자열이 "reboot"인지 확인
-    if (input.equals("reboot")) {
+    if (input.equals("reboot") || input.equals("r")) {
       Serial.println("Sending reboot signal...");
       LoRa.beginPacket();
       LoRa.print("REBOOT");
