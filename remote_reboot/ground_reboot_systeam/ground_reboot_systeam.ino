@@ -9,11 +9,11 @@ void setup() {
   Serial.begin(9600);
   while (!Serial);
 
-  Serial.println("LoRa Sender");
+  Serial.println("LoRa Sender/Receiver");
 
   // LoRa 모듈 초기화
   LoRa.setPins(csPin, resetPin, irqPin);
-  if (!LoRa.begin(9209E5)) { // 주파수를 수신기와 동일하게 설정
+  if (!LoRa.begin(920E6)) { // 주파수를 송신기와 동일하게 설정
     Serial.println("Starting LoRa failed!");
     while (1);
   }
@@ -31,17 +31,38 @@ void loop() {
       LoRa.print("REBOOT");
       LoRa.endPacket();
     } 
-    if else(input.equals("sos")) {
-      Serial.println("Sending reboot signal...");
+    else if (input.equals("sos")) {
+      Serial.println("Sending SOS signal...");
       LoRa.beginPacket();
-      LoRa.print("sos");
+      LoRa.print("SOS");
       LoRa.endPacket();
     }
     else {
-      Serial.println("Unknown command. Type 'reboot' to reboot Arduino.");
+      Serial.println("Unknown command.");
     }
   }
+
+  // 메시지 수신 확인
+  int packetSize = LoRa.parsePacket();
+  if (packetSize) {
+    // 패킷 수신
+    String received = "";
+    while (LoRa.available()) {
+      received += (char)LoRa.read();
+    }
+    Serial.print("Received: ");
+    Serial.println(received);
+    
+    // 수신된 메시지에 따른 동작
+    if (received.equals("REBOOT_SUCCESS")) {
+      Serial.println("REBOOT_SUCCESS.");
+      // 재부팅 명령 처리 코드 추가 가능
+    }
+    else if (received.equals("Parachute Deployed")) {
+      Serial.println("Parachute Deployed SUCCESS.");
+      // SOS 명령 처리 코드 추가 가능
+    }
+  }
+
   delay(500); // 버튼 입력 확인 주기 (500ms)
 }
-
-
