@@ -37,32 +37,6 @@ void loop() {
     counter;
     delay(10); // 필요한 대로 지연 시간 조정
 }
-// void onReceive(int packetSize) {
-//   if (packetSize == 0) return; // 패킷이 없으면 반환
 
-//   String incoming = "";
-//   while (LoRa.available()) {
-//     incoming += (char)LoRa.read();
-//   }
-
-//   Serial.print("Received: ");
-//   Serial.println(incoming);
-
-//   if (incoming == "REBOOT") {
-//     Serial.println("Rebooting...");
-
-//     // 송신
-//     LoRa.beginPacket();
-//     LoRa.print("REBOOT_SUCCESS");
-//     LoRa.endPacket();
-//     delay(1000); // 송신 완료를 위한 지연 시간
-
-//     Serial.println("REBOOT_SUCCESS");
-//     // 재부팅
-//     void(* resetFunc) (void) = 0; // 함수 포인터 정의
-//     resetFunc(); // 재부팅 실행
-    
-//   }
-// }
 
 
