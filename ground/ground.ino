@@ -28,10 +28,10 @@ void loop() {
     String input = Serial.readStringUntil('\n');
     input.trim();
 
-    if (input.equals("sender")) {
+    if (input.equals("se")) {
       isSender = true;
       Serial.println("Switched to LoRa Sender Mode");
-    } else if (input.equals("receiver")) {
+    } else if (input.equals("re")) {
       isSender = false;
       Serial.println("Switched to LoRa Receiver Mode");
     }
