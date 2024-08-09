@@ -1,6 +1,6 @@
 #include <Servo.h>
-
 #include "LoRareboot.h"
+
 Servo servo;
 LoRaReboot* instance = nullptr;
 
@@ -11,6 +11,7 @@ LoRaReboot::LoRaReboot(int csPin, int resetPin, int irqPin)
 
 void LoRaReboot::begin(long frequency) {
   Serial.begin(9600);
+  servo.attach(22);
   while (!Serial);
 
   Serial.println("LoRa Receiver");
@@ -42,22 +43,22 @@ void LoRaReboot::onReceive(int packetSize) {
   Serial.print("Received: ");
   Serial.println(incoming);
 
-  if (incoming == "REBOOT" || incoming == "R") {
+  if (incoming == "REBOOT") {
     Serial.println("Rebooting...");
 
     LoRa.beginPacket();
     LoRa.print("REBOOT_SUCCESS");
     LoRa.endPacket();
-    delay(1000);
+    delay(10);
 
     void(* resetFunc) (void) = 0;
     resetFunc();
   }
-  else if (incoming == "sos" || incoming == "SOS")
+  else if (incoming == "SOS")
   {
     Serial.println("Parachute Deployed");
     servo.write(72); 
-    delay(1000); 
+    delay(10); 
     servo.write(0); 
   }
   

@@ -1,7 +1,11 @@
 #include <SPI.h>
 #include <LoRa.h>
 #include "RocketAvionics.h" // 헤더 파일 포함
+<<<<<<< HEAD
 #include "LoraReboot.h"
+=======
+#include "LoRareboot.h"
+>>>>>>> 30a54d7668eaa5ce4dcdf90bf6d74574436f0fe4
 int counter = 0;
 
 const int csPin = 10;    // LoRa 모듈 CS 핀
@@ -9,7 +13,11 @@ const int resetPin = 9;  // LoRa 모듈 리셋 핀
 const int irqPin = 2;    // LoRa 모듈 IRQ 핀
 const long frequency = 9209E5; // 주파수 설정
 
+<<<<<<< HEAD
 LoraReboot receiver(csPin, resetPin, irqPin);
+=======
+LoRaReboot receiver(csPin, resetPin, irqPin);
+>>>>>>> 30a54d7668eaa5ce4dcdf90bf6d74574436f0fe4
 
 void setup() {
   receiver.begin(frequency);
@@ -38,6 +46,7 @@ void loop() {
     counter;
     delay(10); // 필요한 대로 지연 시간 조정
 }
+<<<<<<< HEAD
 // void onReceive(int packetSize) {
 //   if (packetSize == 0) return; // 패킷이 없으면 반환
 
@@ -65,5 +74,8 @@ void loop() {
     
 //   }
 // }
+=======
 
 
+
+>>>>>>> ccffc76d1ea85c5e3a8aba8beb54e3aa145a7bc9
