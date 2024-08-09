@@ -1,11 +1,7 @@
 #include <SPI.h>
 #include <LoRa.h>
-<<<<<<< HEAD:spi_receiver/spi_receiver.ino
-#include "LoraReboot.h"
-=======
 #include "LoRareboot.h"
 #include "LoRa_ground.h"
->>>>>>> 30a54d7668eaa5ce4dcdf90bf6d74574436f0fe4:spi_sender/spi_receiver.ino
 
 const int csPin = 10;
 const int resetPin = 9;
