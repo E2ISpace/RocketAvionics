@@ -1,7 +1,7 @@
 #include <SD.h>
 #include <SPI.h>
 
-#define SS 0
+
 
 
 void setup() {
@@ -10,7 +10,7 @@ void setup() {
   delay(1000); // 시리얼 통신 초기화 대기
 
   // SD 카드 초기화
-  if (!SD.begin(SS)) {
+  if (!SD.begin(10)) {
     Serial.println("SD 카드 초기화 실패!");
     return;
   }

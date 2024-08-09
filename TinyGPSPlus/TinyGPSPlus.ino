@@ -1,4 +1,4 @@
-#include <TinyGPSPlus.h>
+#include "TinyGPSPlus.h"
 /* 
    This sample sketch should be the first you try out when you are testing a TinyGPSPlus
    (TinyGPSPlus) installation.  In normal use, you feed TinyGPSPlus objects characters from
@@ -21,7 +21,7 @@ void setup()
 {
   Serial.begin(115200);
 
-  Serial.println(F("BasicExample.ino"));
+  Serial.println(F("TinyGPSPlus.ino"));
   Serial.println(F("Basic demonstration of TinyGPSPlus (no device needed)"));
   Serial.print(F("Testing TinyGPSPlus library v. ")); Serial.println(TinyGPSPlus::libraryVersion());
   Serial.println(F("by Mikal Hart"));
