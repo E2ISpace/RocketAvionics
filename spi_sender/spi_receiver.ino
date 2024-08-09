@@ -2,14 +2,14 @@
 #include <LoRa.h>
 #include "LoRareboot.h"
 
-const int csPin = 10;    // LoRa 모듈 CS 핀
-const int resetPin = 9;  // LoRa 모듈 리셋 핀
-const int irqPin = 2;    // LoRa 모듈 IRQ 핀
-const long frequency = 9209E5; // 주파수 설정
+const int csPin = 10;
+const int resetPin = 9;
+const int irqPin = 2;
 
 LoRaReboot receiver(csPin, resetPin, irqPin);
 
 void setup() {
+
   receiver.begin(9209E5);
 }
 
@@ -47,7 +47,3 @@ void loop() {
     Serial.println(values[2]);
   }
 }
-
-
-
-
