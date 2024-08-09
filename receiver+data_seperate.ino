@@ -2,19 +2,15 @@
 #include <LoRa.h>
 #include "LoRareboot.h"
 
-const int csPin = 10;
-const int resetPin = 9;
-const int irqPin = 2;
+const int csPin = 10;    // LoRa 모듈 CS 핀
+const int resetPin = 9;  // LoRa 모듈 리셋 핀
+const int irqPin = 2;    // LoRa 모듈 IRQ 핀
+const long frequency = 9209E5; // 주파수 설정
 
 LoRaReboot receiver(csPin, resetPin, irqPin);
 
 void setup() {
-<<<<<<< HEAD
-
   receiver.begin(9209E5);
-=======
-  receiver.begin(frequency);
->>>>>>> ccffc76d1ea85c5e3a8aba8beb54e3aa145a7bc9
 }
 
 void loop() {
@@ -42,6 +38,8 @@ void loop() {
       values[index++] = atof(ptr); // 문자열을 실수형(float)으로 변환하여 배열에 저장
       ptr = strtok(NULL, ",");
     }
+
+    // yaw, pitch, roll 값을 시리얼 포트로 전송
     Serial.print(values[0]);
     Serial.print(",");
     Serial.print(values[1]);
@@ -49,3 +47,7 @@ void loop() {
     Serial.println(values[2]);
   }
 }
+
+
+
+

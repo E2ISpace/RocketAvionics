@@ -38,6 +38,7 @@ void loop() {
     counter;
     delay(10); // 필요한 대로 지연 시간 조정
 }
+<<<<<<< HEAD
 // void onReceive(int packetSize) {
 //   if (packetSize == 0) return; // 패킷이 없으면 반환
 
@@ -65,3 +66,8 @@ void loop() {
     
 //   }
 // }
+=======
+
+
+
+>>>>>>> ccffc76d1ea85c5e3a8aba8beb54e3aa145a7bc9
