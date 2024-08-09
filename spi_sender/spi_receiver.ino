@@ -9,12 +9,7 @@ const int irqPin = 2;
 LoRaReboot receiver(csPin, resetPin, irqPin);
 
 void setup() {
-<<<<<<< HEAD
-
   receiver.begin(9209E5);
-=======
-  receiver.begin(frequency);
->>>>>>> ccffc76d1ea85c5e3a8aba8beb54e3aa145a7bc9
 }
 
 void loop() {
