@@ -1,6 +1,7 @@
 #include <SPI.h>
 #include <LoRa.h>
 #include "LoRareboot.h"
+#include "LoRa_ground.h"
 
 const int csPin = 10;
 const int resetPin = 9;
