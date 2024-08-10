@@ -2,6 +2,7 @@
 #ifndef QUATERNIONFILTER_H
 #define QUATERNIONFILTER_H
 
+
 enum class QuatFilterSel
 {
     NONE,
@@ -37,6 +38,8 @@ public:
         deltaT = newTime - oldTime;
         oldTime = newTime;
         deltaT = fabs(deltaT * 0.001 * 0.001);
+        // deltaT = 0.02f;
+        deltaT = 0.173f;
 
         switch (filter_sel)
         {
