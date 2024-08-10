@@ -134,7 +134,7 @@ void loop()
             sprintf(buffer,
                     "%.2f, %.2f ,%.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f",
                     temp, AccX, AccY, AccZ, GyroX, GyroY, GyroZ, rocketAngle, linearAcc[0], linearAcc[1], linearAcc[2]);
-            dataFile.print(buffer);
+            dataFile.println(buffer);
             // dataFile.print(timeWhen - 1.59f);
             // dataFile.print(": ");
             // dataFile.print(AccX);
