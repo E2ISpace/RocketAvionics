@@ -13,6 +13,10 @@ File dataFile;
 
 float angle = 0.0; // 전역 변수로 선언하여 AngleCalculator에서 사용
 unsigned long startTime; // 타이머를 위한 변수
+unsigned long loopStartTime; // 타이머를 위한 변수
+unsigned long timeWhen; // 타이머를 위한 변수
+unsigned long dt; // 타이머를 위한 변수
+
 bool isAngleCheckEnabled = false; // angle 체크 활성화 여부
 
 void setup() {
@@ -56,6 +60,7 @@ void setup() {
 }
 
 void loop() {
+    loopStartTime=micros();
     if (mpu.update()) {
         float yaw = mpu.getYaw();
         float pitch = mpu.getPitch();
@@ -63,6 +68,7 @@ void loop() {
         float AccX = mpu.getAccX();
         float AccY = mpu.getAccY();
         float AccZ = mpu.getAccZ(); //data Value 추가하기
+        timeWhen = startTime-millis();
 
         // Angle계산
         AngleCalculator(yaw, pitch, roll);
@@ -84,11 +90,6 @@ void loop() {
             dataFile.flush(); // 데이터가 즉시 쓰이도록 보장 
         } 
 
-    
-        // 설정 완료 후 일정 시간 지난 후 angle 체크 활성화
-        if (millis() - startTime >= delayTime) {
-            isAngleCheckEnabled = true;
-        }
         // 조건 확인 및 서보 모터 작동
         if (isAngleCheckEnabled && (angle <= 65 || angle >= 110)) {
             deployParachute();
@@ -97,6 +98,7 @@ void loop() {
             deployParachute();
         }
     }
+    dt=loopStartTime-micros();
 }
 
 // 낙하산 사출하는 함수
