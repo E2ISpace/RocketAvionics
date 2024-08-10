@@ -13,7 +13,6 @@ File dataFile;
 
 float angle = 0.0; // 전역 변수로 선언하여 AngleCalculator에서 사용
 unsigned long startTime; // 타이머를 위한 변수
-const unsigned long delayTime = 5000; // 설정 후 대기 시간 (5초)
 bool isAngleCheckEnabled = false; // angle 체크 활성화 여부
 
 void setup() {
@@ -29,7 +28,7 @@ void setup() {
     
     dataFile = SD.open("data.txt", FILE_WRITE);
     if (dataFile) {
-        dataFile.println(F("AccX,AccY,AccZ,Yaw,Pitch,Roll,Angle"));
+        dataFile.println(F("Time,AccX,AccY,AccZ,GyroX,GyroY,GyroZ,Yaw,Pitch,Roll,Angle"));
     } else {
         while (1); // 파일 열기 실패 시 무한 루프
     }
@@ -49,11 +48,8 @@ void setup() {
       while (1); // MPU9250 초기화 실패 시 무한 루프
     }
 
-    mpu.verbose(true);
     mpu.setAccBias(-946.44, 633.1475, -1104.61);
     mpu.setGyroBias(280.12, -488.685, 167.025);
-    mpu.calibrateMag();
-    mpu.selectFilter(QuatFilterSel::MAHONY);
 
     startTime = millis(); // 설정 시작 시간을 기록
     isAngleCheckEnabled = false; // 설정 완료 전까지 angle 체크 비활성화
@@ -66,7 +62,7 @@ void loop() {
         float roll = mpu.getRoll();
         float AccX = mpu.getAccX();
         float AccY = mpu.getAccY();
-        float AccZ = mpu.getAccZ();
+        float AccZ = mpu.getAccZ(); //data Value 추가하기
 
         // Angle계산
         AngleCalculator(yaw, pitch, roll);
@@ -100,7 +96,7 @@ void loop() {
             dataFile.print(roll);
             dataFile.print(", ");
             dataFile.println(angle);
-            dataFile.flush(); // 데이터가 즉시 쓰이도록 보장
+            dataFile.flush(); // 데이터가 즉시 쓰이도록 보장 
         } 
         
         // 설정 완료 후 일정 시간 지난 후 angle 체크 활성화
@@ -147,3 +143,9 @@ void AngleCalculator(float yaw, float pitch, float roll) {
     // 사이각 계산
     angle = acos(dotProduct / vectorMagnitude) * RAD_TO_DEG;
 }
+
+
+
+// void complementary_Filter(){
+
+// }
