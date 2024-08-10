@@ -5,32 +5,33 @@
 
 // 데이터 타입을 효율적으로 사용
 const byte servoPin = 3;
-const byte chipSelect = 10;
+const byte chipSelect = 53;
 
 MPU9250 mpu;
 Servo servo;
 File dataFile;
 
 float angle = 0.0; // 전역 변수로 선언하여 AngleCalculator에서 사용
+unsigned long startTime; // 타이머를 위한 변수
+const unsigned long delayTime = 5000; // 설정 후 대기 시간 (5초)
+bool isAngleCheckEnabled = false; // angle 체크 활성화 여부
 
 void setup() {
     Serial.begin(9600);
     Wire.begin();
     servo.attach(servoPin);
     servo.write(0);
+    delay(1000);
 
     if (!SD.begin(chipSelect)) {
-        Serial.println(F("SD 카드 초기화 실패!"));
-        while (1);
+      while (1); // 초기화 실패 시 무한 루프
     }
-    Serial.println(F("SD 카드 초기화 완료."));
-
+    
     dataFile = SD.open("data.txt", FILE_WRITE);
     if (dataFile) {
         dataFile.println(F("AccX,AccY,AccZ,Yaw,Pitch,Roll,Angle"));
     } else {
-        Serial.println(F("데이터 파일 열기 오류"));
-        while (1);
+        while (1); // 파일 열기 실패 시 무한 루프
     }
 
     // MPU9250 초기 설정 최소화
@@ -38,17 +39,24 @@ void setup() {
     setting.accel_fs_sel = ACCEL_FS_SEL::A16G;
     setting.gyro_fs_sel = GYRO_FS_SEL::G2000DPS;
     setting.mag_output_bits = MAG_OUTPUT_BITS::M16BITS;
+    setting.fifo_sample_rate = FIFO_SAMPLE_RATE::SMPL_200HZ;
+    setting.gyro_fchoice = 0x03;
+    setting.gyro_dlpf_cfg = GYRO_DLPF_CFG::DLPF_41HZ;
+    setting.accel_fchoice = 0x01;
+    setting.accel_dlpf_cfg = ACCEL_DLPF_CFG::DLPF_45HZ;
 
     if (!mpu.setup(0x68, setting)) {
-        Serial.println(F("MPU9250 setup failed"));
-        while (1);
+      while (1); // MPU9250 초기화 실패 시 무한 루프
     }
 
-    // mpu.verbose(false); // 디버그 모드 비활성화
+    mpu.verbose(true);
     mpu.setAccBias(-946.44, 633.1475, -1104.61);
     mpu.setGyroBias(280.12, -488.685, 167.025);
     mpu.calibrateMag();
     mpu.selectFilter(QuatFilterSel::MAHONY);
+
+    startTime = millis(); // 설정 시작 시간을 기록
+    isAngleCheckEnabled = false; // 설정 완료 전까지 angle 체크 비활성화
 }
 
 void loop() {
@@ -56,55 +64,86 @@ void loop() {
         float yaw = mpu.getYaw();
         float pitch = mpu.getPitch();
         float roll = mpu.getRoll();
+        float AccX = mpu.getAccX();
+        float AccY = mpu.getAccY();
+        float AccZ = mpu.getAccZ();
 
-        // 가속도계를 사용하는 계산은 제거
-        AngleCalculator(yaw, pitch);
-
-        // 데이터 로그
-        logData(mpu.getAccX(), mpu.getAccY(), mpu.getAccZ(), yaw, pitch, roll, angle);
-
-        Serial.print(F("Angle: "));
+        // Angle계산
+        AngleCalculator(yaw, pitch, roll);
+/*
+        Serial.print("AccX : ");
+        Serial.print(AccX);
+        Serial.print(", AccY: ");
+        Serial.print(AccY);
+        Serial.print(", AccZ: ");
+        Serial.println(AccZ);
+        Serial.print("Yaw: ");
+        Serial.print(yaw);
+        Serial.print(", Pitch: ");
+        Serial.print(pitch);
+        Serial.print(", Roll: ");
+        Serial.print(roll);
+        Serial.print(" -> Angle: ");
         Serial.println(angle);
-
-        if (angle <= 0 || angle >= 180) {
+*/
+        if (dataFile) {
+            dataFile.print(AccX);
+            dataFile.print(", ");
+            dataFile.print(AccY);
+            dataFile.print(", ");
+            dataFile.print(AccZ);
+            dataFile.print(", ");
+            dataFile.print(yaw);
+            dataFile.print(", ");
+            dataFile.print(pitch);
+            dataFile.print(", ");
+            dataFile.print(roll);
+            dataFile.print(", ");
+            dataFile.println(angle);
+            dataFile.flush(); // 데이터가 즉시 쓰이도록 보장
+        } 
+        
+        // 설정 완료 후 일정 시간 지난 후 angle 체크 활성화
+        if (millis() - startTime >= delayTime) {
+            isAngleCheckEnabled = true;
+        }
+        // 조건 확인 및 서보 모터 작동
+        if (isAngleCheckEnabled && (angle <= 65 || angle >= 110)) {
+            deployParachute();
+        }
+        else if (isAngleCheckEnabled && (AccZ <= abs(0.3))) {
             deployParachute();
         }
     }
 }
 
-void deployParachute() {
-    Serial.println(F("Parachute Deployed"));
+// 낙하산 사출하는 함수
+void deployParachute() { 
     servo.write(72);
     delay(1000);
     servo.write(0);
 }
 
-// 작은 함수는 인라인화하여 처리
-inline void AngleCalculator(float yaw, float pitch) {
+// Angle계산하는 함수
+void AngleCalculator(float yaw, float pitch, float roll) {
+    // 도(degree)에서 라디안(radian)으로 변환
     float yawRad = yaw * DEG_TO_RAD;
     float pitchRad = pitch * DEG_TO_RAD;
 
-    float dotProduct = sin(pitchRad);
+    // 방향 벡터 계산 (yaw와 pitch 사용)
+    float x = cos(pitchRad) * cos(yawRad);
+    float y = cos(pitchRad) * sin(yawRad);
+    float z = sin(pitchRad);
 
-    angle = acos(dotProduct) * RAD_TO_DEG;
+    // 목표 벡터 (위쪽 방향)
+    float targetX = 0;
+    float targetY = 0;
+    float targetZ = 1;
+
+    // 벡터 내적
+    float dotProduct = x * targetX + y * targetY + z * targetZ;
+    float vectorMagnitude = sqrt(x * x + y * y + z * z) * sqrt(targetX * targetX + targetY * targetY + targetZ * targetZ);
+
+    // 사이각 계산
+    angle = acos(dotProduct / vectorMagnitude) * RAD_TO_DEG;
 }
-
-// 데이터 로깅 함수
-void logData(float AccX, float AccY, float AccZ, float yaw, float pitch, float roll, float angle) {
-    if (dataFile) {
-        dataFile.print(AccX);
-        dataFile.print(F(","));
-        dataFile.print(AccY);
-        dataFile.print(F(","));
-        dataFile.print(AccZ);
-        dataFile.print(F(","));
-        dataFile.print(yaw);
-        dataFile.print(F(","));
-        dataFile.print(pitch);
-        dataFile.print(F(","));
-        dataFile.print(roll);
-        dataFile.print(F(","));
-        dataFile.println(angle);
-    }
-}
-
