@@ -66,22 +66,7 @@ void loop() {
 
         // Angle계산
         AngleCalculator(yaw, pitch, roll);
-/*
-        Serial.print("AccX : ");
-        Serial.print(AccX);
-        Serial.print(", AccY: ");
-        Serial.print(AccY);
-        Serial.print(", AccZ: ");
-        Serial.println(AccZ);
-        Serial.print("Yaw: ");
-        Serial.print(yaw);
-        Serial.print(", Pitch: ");
-        Serial.print(pitch);
-        Serial.print(", Roll: ");
-        Serial.print(roll);
-        Serial.print(" -> Angle: ");
-        Serial.println(angle);
-*/
+
         if (dataFile) {
             dataFile.print(AccX);
             dataFile.print(", ");
@@ -98,7 +83,8 @@ void loop() {
             dataFile.println(angle);
             dataFile.flush(); // 데이터가 즉시 쓰이도록 보장 
         } 
-        
+
+    
         // 설정 완료 후 일정 시간 지난 후 angle 체크 활성화
         if (millis() - startTime >= delayTime) {
             isAngleCheckEnabled = true;
