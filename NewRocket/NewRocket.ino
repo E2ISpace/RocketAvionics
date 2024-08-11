@@ -14,11 +14,11 @@ MPU9250 mpu;
 Servo servo;
 File dataFile;
 float yaw, pitch, roll;
-float angle = 0.0;             // 전역 변수로 선언하여 AngleCalculator에서 사용
-unsigned long prevTime;        // 타이머를 위한 변수
-unsigned long loopStartTime;   // 타이머를 위한 변수
-float timeWhen;                // 타이머를 위한 변수
-const unsigned long dt = 173;  // 0.173 s=1730ms
+float angle = 0.0;            // 전역 변수로 선언하여 AngleCalculator에서 사용
+unsigned long prevTime;       // 타이머를 위한 변수
+unsigned long loopStartTime;  // 타이머를 위한 변수
+float timeWhen;               // 타이머를 위한 변수
+const unsigned long dt = 30;  // 0.03 s=1730ms
 float acc_Pitch, gyro_Pitch = 0;
 float acc_Roll, gyro_Roll = 0;
 float gyro_Yaw = 0;
@@ -34,6 +34,7 @@ float a, b, c = 0.0f;
 float SEq_1 = 1.0f, SEq_2 = 0.0f, SEq_3 = 0.0f, SEq_4 = 0.0f;
 float rocketAngle = 0.0f;
 float linearAcc[3];
+float temp;
 
 void setup() {
   Serial.begin(9600);
@@ -80,106 +81,108 @@ void setup() {
   // startTime = millis(); // 설정 시작 시간을 기록
   // isAngleCheckEnabled = false; // 설정 완료 전까지 angle 체크 비활성화
 
-  MsTimer2::set(13000, deployParachute);  // time out 사출조건 - 1
+  MsTimer2::set(12000, deployParachute);  // time out 사출조건 - 1
   MsTimer2::start();
 }
 
 void loop() {
   loopStartTime = millis();
-  // if (loopStartTime - prevTime >= dt)
-  // {
-  if (mpu.update()) {
-    /*---------------------*/
-    yaw = mpu.getYaw();
-    pitch = mpu.getPitch();
-    roll = mpu.getRoll();
-    AccX = mpu.getAccX();
-    AccY = mpu.getAccY();
-    AccZ = mpu.getAccZ();
-    GyroX = mpu.getGyroX();
-    GyroY = mpu.getGyroY();
-    GyroZ = mpu.getGyroZ();  // data Value 추가하기
-    SEq_1 = mpu.getQuaternionW();
-    SEq_2 = mpu.getQuaternionX();
-    SEq_3 = mpu.getQuaternionY();
-    SEq_4 = mpu.getQuaternionZ();
-    linearAcc[0] = mpu.getLinearAcc(0);
-    linearAcc[1] = mpu.getLinearAcc(1);
-    linearAcc[2] = mpu.getLinearAcc(2);
-    /*-------------------------------*/
-    timeWhen = millis() / 1000.0f;  // 시간 저장하기
-    // filter(AccX, AccY, AccZ, GyroX, GyroY, GyroZ);
-    rocketVector[0] = 2.0 * (SEq_2 * SEq_4 - SEq_1 * SEq_3);        // x축
-    rocketVector[1] = 2.0 * (SEq_1 * SEq_2 + SEq_3 * SEq_4);        // y component
-    rocketVector[2] = 1.0 - 2.0 * (SEq_2 * SEq_2 + SEq_3 * SEq_3);  // z component
-    a = rocketVector[0] * z_Unitvector[0] + rocketVector[1] * z_Unitvector[1] + rocketVector[2] * z_Unitvector[2];
-    b = sqrt(rocketVector[0] * rocketVector[0] + rocketVector[1] * rocketVector[1] + rocketVector[2] * rocketVector[2]);
-    c = sqrt(z_Unitvector[0] * z_Unitvector[0] + z_Unitvector[1] * z_Unitvector[1] + z_Unitvector[2] * z_Unitvector[2]);
+  if (loopStartTime - prevTime >= dt) {
+    if (mpu.update()) {
+      /*---------------------*/
+      yaw = mpu.getYaw();
+      pitch = mpu.getPitch();
+      roll = mpu.getRoll();
+      AccX = mpu.getAccX();
+      AccY = mpu.getAccY();
+      AccZ = mpu.getAccZ();
+      GyroX = mpu.getGyroX();
+      GyroY = mpu.getGyroY();
+      GyroZ = mpu.getGyroZ();  // data Value 추가하기
+      SEq_1 = mpu.getQuaternionW();
+      SEq_2 = mpu.getQuaternionX();
+      SEq_3 = mpu.getQuaternionY();
+      SEq_4 = mpu.getQuaternionZ();
+      linearAcc[0] = mpu.getLinearAcc(0);
+      linearAcc[1] = mpu.getLinearAcc(1);
+      linearAcc[2] = mpu.getLinearAcc(2);
+      /*-------------------------------*/
+      timeWhen = millis() / 1000.0f;  // 시간 저장하기
+      // filter(AccX, AccY, AccZ, GyroX, GyroY, GyroZ);
+      rocketVector[0] = 2.0 * (SEq_2 * SEq_4 - SEq_1 * SEq_3);        // x축
+      rocketVector[1] = 2.0 * (SEq_1 * SEq_2 + SEq_3 * SEq_4);        // y component
+      rocketVector[2] = 1.0 - 2.0 * (SEq_2 * SEq_2 + SEq_3 * SEq_3);  // z component
+      a = rocketVector[0] * z_Unitvector[0] + rocketVector[1] * z_Unitvector[1] + rocketVector[2] * z_Unitvector[2];
+      b = sqrt(rocketVector[0] * rocketVector[0] + rocketVector[1] * rocketVector[1] + rocketVector[2] * rocketVector[2]);
+      c = sqrt(z_Unitvector[0] * z_Unitvector[0] + z_Unitvector[1] * z_Unitvector[1] + z_Unitvector[2] * z_Unitvector[2]);
 
-    rocketAngle = acos(a / (b * c)) * RAD_TO_DEG;  // inner product(dot product) Rocket vector with Z unit vector
+      rocketAngle = acos(a / (b * c)) * RAD_TO_DEG;  // inner product(dot product) Rocket vector with Z unit vector
+      /*deploy!*/
+      if(rocketAngle>=45.0f){
+        deployParachute();
+      }
+      // Serial.println(rocketAngle); // test complete.
+      temp = timeWhen - 1.59f;  // 경과 시간
 
-    // Serial.println(rocketAngle); // test complete.
-    float temp = timeWhen - 1.59f;
+      if (dataFile) {
+        char b1[10];
+        char b2[10];
+        char b3[10];
+        char b4[10];
+        char b5[10];
+        char b6[10];
+        char b7[10];
+        char b8[10];
+        char b9[12];
+        char b10[12];
+        char b11[12];
 
-    if (dataFile) {
-      char b1[10];
-      char b2[10];
-      char b3[10];
-      char b4[10];
-      char b5[10];
-      char b6[10];
-      char b7[10];
-      char b8[10];
-      char b9[12];
-      char b10[12];
-      char b11[12];
+        dtostrf(temp, 5, 2, b1);
+        dtostrf(AccX * 9.8, 7, 2, b2);
+        dtostrf(AccY * 9.8, 7, 2, b3);
+        dtostrf(AccZ * 9.8, 7, 2, b4);
+        dtostrf(GyroX, 6, 2, b5);
+        dtostrf(GyroY, 6, 2, b6);
+        dtostrf(GyroZ, 6, 2, b7);
+        dtostrf(rocketAngle, 7, 2, b8);
+        dtostrf(linearAcc[0] * 9.8, 7, 2, b9);
+        dtostrf(linearAcc[1] * 9.8, 7, 2, b10);
+        dtostrf(linearAcc[2] * 9.8, 7, 2, b11);
 
-      dtostrf(temp, 4, 2, b1);
-      dtostrf(AccX*9.8, 7, 2, b2);
-      dtostrf(AccY*9.8, 7, 2, b3);
-      dtostrf(AccZ*9.8, 7, 2, b4);
-      dtostrf(GyroX, 6, 2, b5);
-      dtostrf(GyroY, 6, 2, b6);
-      dtostrf(GyroZ, 6, 2, b7);
-      dtostrf(rocketAngle, 7, 2, b8);
-      dtostrf(linearAcc[0]*9.8, 7, 2, b9);
-      dtostrf(linearAcc[1]*9.8, 7, 2, b10);
-      dtostrf(linearAcc[2]*9.8, 7, 2, b11);
+        // Serial.println(b8);
 
-      Serial.println(b11);
-
-      // char buffer[200];
-      // sprintf(buffer,
-      //         "%s",
-      //         b1);
-      // dataFile.println(buffer);
-      /*------------------------------------*/
-      dataFile.print(timeWhen - 1.59f);
-      dataFile.print(": ");
-      dataFile.print(AccX * 9.8);
-      dataFile.print(", ");
-      dataFile.print(AccY * 9.8);
-      dataFile.print(", ");
-      dataFile.print(AccZ * 9.8);
-      dataFile.print(", ");
-      dataFile.print(GyroX);
-      dataFile.print(", ");
-      dataFile.print(GyroY);
-      dataFile.print(", ");
-      dataFile.print(GyroZ);
-      dataFile.print(", ");
-      dataFile.print(rocketAngle);
-      dataFile.print(", ");
-      dataFile.print(linearAcc[0]);
-      dataFile.print(", ");
-      dataFile.print(linearAcc[1]);
-      dataFile.print(", ");
-      dataFile.println(linearAcc[2]);
-      dataFile.flush();
+        char buffer[200];
+        sprintf(buffer,
+                "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,",
+                b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11);
+        dataFile.println(buffer);
+        /*------------------------------------*/
+        // dataFile.print(timeWhen - 1.59f);
+        // dataFile.print(": ");
+        // dataFile.print(AccX * 9.8);
+        // dataFile.print(", ");
+        // dataFile.print(AccY * 9.8);
+        // dataFile.print(", ");
+        // dataFile.print(AccZ * 9.8);
+        // dataFile.print(", ");
+        // dataFile.print(GyroX);
+        // dataFile.print(", ");
+        // dataFile.print(GyroY);
+        // dataFile.print(", ");
+        // dataFile.print(GyroZ);
+        // dataFile.print(", ");
+        // dataFile.print(rocketAngle);
+        // dataFile.print(", ");
+        // dataFile.print(linearAcc[0]);
+        // dataFile.print(", ");
+        // dataFile.print(linearAcc[1]);
+        // dataFile.print(", ");
+        // dataFile.println(linearAcc[2]);
+        dataFile.flush();
+      }
     }
+    prevTime = loopStartTime;
   }
-  prevTime = loopStartTime;
-  // }
   // Serial.println(millis() - loopStartTime);  // time testing.
 }
 
@@ -188,7 +191,7 @@ void deployParachute() {
   servo.write(72);
   delay(1000);
   servo.write(0);
-  Serial.println("parachute timeout");
+  Serial.println("parachute complete");
   MsTimer2::stop();
 }
 
