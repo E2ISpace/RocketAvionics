@@ -49,7 +49,7 @@ void setup() {
 
   dataFile = SD.open("data.txt", FILE_WRITE);
   if (dataFile) {
-    dataFile.println("Time:AccX,AccY,AccZ,GyroX,GyroY,GyroZ,Angle,linearAccX,linearAccY,linearAccZ");
+    dataFile.println("Time:AccX,AccY,AccZ,GyroX,GyroY,GyroZ,Angle,linearAccX,linearAccY,linearAccZ1111");
   } else {
     while (1)
       ;  // 파일 열기 실패 시 무한 루프
@@ -120,64 +120,67 @@ void loop() {
 
     // Serial.println(rocketAngle); // test complete.
     float temp = timeWhen - 1.59f;
-    if (dataFile) {
-      char b1[8];
-      char b2[8];
-      char b3[8];
-      char b4[8];
-      char b5[8];
-      char b6[8];
-      char b7[8];
-      char b8[8];
-      char b9[8];
-      char b10[8];
-      char b11[8];
 
-      dtostrf(temp, 6, 2, b1);
-      dtostrf(AccX, 6, 2, b2);
-      dtostrf(AccY, 6, 2, b3);
-      dtostrf(AccZ, 6, 2, b4);
+    if (dataFile) {
+      char b1[10];
+      char b2[10];
+      char b3[10];
+      char b4[10];
+      char b5[10];
+      char b6[10];
+      char b7[10];
+      char b8[10];
+      char b9[12];
+      char b10[12];
+      char b11[12];
+
+      dtostrf(temp, 4, 2, b1);
+      dtostrf(AccX*9.8, 7, 2, b2);
+      dtostrf(AccY*9.8, 7, 2, b3);
+      dtostrf(AccZ*9.8, 7, 2, b4);
       dtostrf(GyroX, 6, 2, b5);
       dtostrf(GyroY, 6, 2, b6);
       dtostrf(GyroZ, 6, 2, b7);
-      dtostrf(rocketAngle, 6, 2, b8);
-      dtostrf(linearAcc[0], 6, 2, b9);
-      dtostrf(linearAcc[1], 6, 2, b10);
-      dtostrf(linearAcc[2], 6, 2, b11);
+      dtostrf(rocketAngle, 7, 2, b8);
+      dtostrf(linearAcc[0]*9.8, 7, 2, b9);
+      dtostrf(linearAcc[1]*9.8, 7, 2, b10);
+      dtostrf(linearAcc[2]*9.8, 7, 2, b11);
 
-      char buffer[100];
-      sprintf(buffer,
-              "%s, %s ,%s, %s, %s, %s, %s, %s, %s, %s, %s",
-              b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11);
-      dataFile.println(buffer);
-      delay(10);
-      // dataFile.print(timeWhen - 1.59f);
-      // dataFile.print(": ");
-      // dataFile.print(AccX);
-      // dataFile.print(", ");
-      // dataFile.print(AccY);
-      // dataFile.print(", ");
-      // dataFile.print(AccZ);
-      // dataFile.print(", ");
-      // dataFile.print(GyroX);
-      // dataFile.print(", ");
-      // dataFile.print(GyroY);
-      // dataFile.print(", ");
-      // dataFile.print(GyroZ);
-      // dataFile.print(", ");
-      // dataFile.print(rocketAngle);
-      // dataFile.print(", ");
-      // dataFile.print(linearAcc[0]);
-      // dataFile.print(", ");
-      // dataFile.print(linearAcc[1]);
-      // dataFile.print(", ");
-      // dataFile.println(linearAcc[2]);
+      Serial.println(b11);
+
+      // char buffer[200];
+      // sprintf(buffer,
+      //         "%s",
+      //         b1);
+      // dataFile.println(buffer);
+      /*------------------------------------*/
+      dataFile.print(timeWhen - 1.59f);
+      dataFile.print(": ");
+      dataFile.print(AccX * 9.8);
+      dataFile.print(", ");
+      dataFile.print(AccY * 9.8);
+      dataFile.print(", ");
+      dataFile.print(AccZ * 9.8);
+      dataFile.print(", ");
+      dataFile.print(GyroX);
+      dataFile.print(", ");
+      dataFile.print(GyroY);
+      dataFile.print(", ");
+      dataFile.print(GyroZ);
+      dataFile.print(", ");
+      dataFile.print(rocketAngle);
+      dataFile.print(", ");
+      dataFile.print(linearAcc[0]);
+      dataFile.print(", ");
+      dataFile.print(linearAcc[1]);
+      dataFile.print(", ");
+      dataFile.println(linearAcc[2]);
       dataFile.flush();
     }
   }
   prevTime = loopStartTime;
   // }
-  Serial.println(millis() - loopStartTime);  // time testing.
+  // Serial.println(millis() - loopStartTime);  // time testing.
 }
 
 // 낙하산 사출하는 함수
