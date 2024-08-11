@@ -9,6 +9,7 @@
 // 데이터 타입을 효율적으로 사용
 const byte servoPin = 3;
 const byte chipSelect = 53;
+bool trigger = false;
 
 MPU9250 mpu;
 Servo servo;
@@ -44,8 +45,9 @@ void setup()
   servo.write(0);
   delay(1000);
 
-  if (!SD.begin(chipSelect))
+  if (!SD.begin())
   {
+    Serial.println("d여기?1");
     while (1)
       ; // 초기화 실패 시 무한 루프
   }
@@ -53,12 +55,14 @@ void setup()
   dataFile = SD.open("data.txt", FILE_WRITE);
   if (dataFile)
   {
-    dataFile.println("Time:AccX,AccY,AccZ,GyroX,GyroY,GyroZ,Angle,linearAccX,linearAccY,linearAccZ1111");
+    dataFile.println("Time:AccX,AccY,AccZ,GyroX,GyroY,GyroZ,Angle,linearAccX,linearAccY,linearAccZ");
   }
   else
   {
+       Serial.println("d여기?2");
     while (1)
       ; // 파일 열기 실패 시 무한 루프
+   
   }
 
   // MPU9250 초기 설정 최소화
@@ -74,6 +78,7 @@ void setup()
 
   if (!mpu.setup(0x68, setting))
   {
+       Serial.println("d여기?3");
     while (1)
       ; // MPU9250 초기화 실패 시 무한 루프
   }
@@ -87,8 +92,18 @@ void setup()
   // startTime = millis(); // 설정 시작 시간을 기록
   // isAngleCheckEnabled = false; // 설정 완료 전까지 angle 체크 비활성화
 
-  MsTimer2::set(12000, deployParachute); // time out 사출조건 - 1
-  MsTimer2::start();
+  // while (!trigger)
+  // {
+  //   mpu.update();
+  //   temp = -mpu.getLinearAcc(2) * 9.8; // 초속
+  //   if (temp >= 10)
+  //   {
+  //     trigger = true;
+  //   }
+  // }
+  // Serial.println("gogo lets go");
+  // MsTimer2::set(12000, deployParachute); // time out 사출조건 - 1
+  // MsTimer2::start();
 }
 
 void loop()
@@ -116,7 +131,7 @@ void loop()
       linearAcc[1] = mpu.getLinearAcc(1);
       linearAcc[2] = mpu.getLinearAcc(2);
       /*-------------------------------*/
-      timeWhen = millis() / 1000.0f; // 시간 저장하기
+      
       // filter(AccX, AccY, AccZ, GyroX, GyroY, GyroZ);
       rocketVector[0] = 2.0 * (SEq_2 * SEq_4 - SEq_1 * SEq_3);       // x축
       rocketVector[1] = 2.0 * (SEq_1 * SEq_2 + SEq_3 * SEq_4);       // y component
@@ -127,12 +142,15 @@ void loop()
 
       rocketAngle = acos(a / (b * c)) * RAD_TO_DEG; // inner product(dot product) Rocket vector with Z unit vector
       /*deploy!*/
+
+      // Serial.println(rocketAngle); // test complete.
+      timeWhen = millis() / 1000.0f; // 시간 저장하기
+      temp = timeWhen - 1.59f; // 경과 시간
       if (rocketAngle >= 45.0f)
       {
         deployParachute();
+        Serial.println("angle deploy");
       }
-      // Serial.println(rocketAngle); // test complete.
-      temp = timeWhen - 1.59f; // 경과 시간
 
       if (dataFile)
       {
@@ -201,10 +219,10 @@ void loop()
 void deployParachute()
 {
   servo.write(72);
-  delay(1000);
+  delay(500);
   servo.write(0);
   Serial.println("parachute complete");
-  MsTimer2::stop();
+  // MsTimer2::stop();
 }
 
 // Angle계산하는 함수
